@@ -2,16 +2,10 @@ nltk
 sentence-transformers
 requests
 python-dotenv
-gradio
 pypdf
 openai
 openai-agents
 pypdf2
-PyPDF2
 python-docx
 numpy
 chromadb
-streamlit
-bs4
-PyGithub
-smtplib
