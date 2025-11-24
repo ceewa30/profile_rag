@@ -52,7 +52,7 @@ class ChromaStore:
 
     def load(self):
         print(f"[INFO] Loading Chroma store from {self.persist_directory}...")
-        db_path = "/Users/sivakumars/Documents/Agentic_AI/chroma_store"
+        db_path = os.path.abspath(self.persist_directory)
         self.chroma_client = chromadb.PersistentClient(
             path=db_path
         )

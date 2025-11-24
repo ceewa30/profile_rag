@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from src.data_loader import DataLoader
 from src.chromastore import ChromaStore
 from openai import OpenAI
 
@@ -15,7 +16,8 @@ class RAGSearch:
         self.chroma_store = ChromaStore(persist_directory=chroma_store_path, embedding_function=embedding_model)
 
         # Load or build the Chroma store
-        data_loader = DataLoader("/Users/sivakumars/Documents/Agentic_AI/me")
+        current_directory = os.getcwd()
+        data_loader = DataLoader(f"{current_directory}/me")
         document = data_loader.load_all_documents()
         self.build_store(document)
         self.load_store()
