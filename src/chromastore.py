@@ -31,6 +31,9 @@ class ChromaStore:
 
 
     def build_from_documents(self, documents: List[Any]) -> str:
+        if not documents or len(documents) == 0:
+            print("⚠️ Warning: No document chunks found to process. Skipping database insert.")
+            return
         print(f"[INFO] Building Chroma store from {len(documents)} raw documents...")
         stopword_remover = StopwordRemover(documents)
         cleaned_text = stopword_remover.remove_stopwords()
@@ -44,6 +47,8 @@ class ChromaStore:
         print(f"[INFO] Chroma store built and persisted at {self.persist_directory}")
 
     def add_embeddings(self, embeddings: np.array, ids: List[str], documents: List[str], metadatas: List[Any] = None):
+        if embeddings.ndim == 1:
+            embeddings = embeddings.reshape(1, -1)
         dim = embeddings.shape[1]
         print(f"[INFO] Adding {embeddings.shape[0]} embeddings to the Chroma store with dimension {dim}...")
         if metadatas is None:
