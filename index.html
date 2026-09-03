@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siva Digital Twin Chat Sandbox</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .chat-container { width: 400px; height: 550px; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
+        .chat-header { background: #007aff; color: white; padding: 16px; font-weight: bold; font-size: 16px; display: flex; justify-content: space-between; }
+        .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #fafafa; }
+        .msg { max-width: 75%; padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
+        .msg.user { background: #007aff; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .msg.bot { background: #e9e9eb; color: black; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .msg.live { background: #34c759; color: white; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .chat-input-area { padding: 12px; border-top: 1px solid #eee; display: flex; gap: 8px; background: white; }
+        input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 20px; outline: none; font-size: 14px; }
+        button { background: #007aff; color: white; border: none; padding: 0 16px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #0063cc; }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="chat-header">
+        <span>Chat with Siva's Digital Twin</span>
+        <span id="status" style="font-size: 12px; opacity: 0.8;">Connecting...</span>
+    </div>
+    <div class="chat-messages" id="chatBox">
+        <div class="msg bot">Hello! I'm Siva's Digital Twin. Ask me anything about his experience, background, or skills!</div>
+    </div>
+    <div class="chat-input-area">
+        <input type="text" id="userInput" placeholder="Type a message..." onkeypress="handleKey(event)">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    // Generate a unique session token for this specific tab instance
+    const sessionId = "session_" + Math.random().toString(36).substr(2, 9);
+    const ws = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${sessionId}`);
+    
+    const chatBox = document.getElementById("chatBox");
+    const statusSpan = document.getElementById("status");
+    const userInput = document.getElementById("userInput");
+
+    ws.onopen = () => { statusSpan.textContent = "Online"; statusSpan.style.color = "#34c759"; };
+    ws.onclose = () => { statusSpan.textContent = "Disconnected"; statusSpan.style.color = "#ff3b30"; };
+    
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        appendMessage(data.sender, data.text);
+    };
+
+    function sendMessage() {
+        const text = userInput.value.trim();
+        if (!text) return;
+        
+        // Render user message on screen
+        appendMessage("You", text);
+        
+        // Pass JSON down the open WebSocket pipeline
+        ws.send(JSON.stringify({ text: text }));
+        userInput.value = "";
+    }
+
+    function handleKey(event) { if (event.key === "Enter") sendMessage(); }
+
+    function appendMessage(sender, text) {
+        const msgDiv = document.createElement("div");
+        msgDiv.classList.add("msg");
+        
+        if (sender === "You") msgDiv.classList.add("user");
+        else if (sender === "Sivakumar (Live)") msgDiv.classList.add("live");
+        else msgDiv.classList.add("bot");
+        
+        msgDiv.textContent = text;
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+    }
+</script>
+</body>
+</html>

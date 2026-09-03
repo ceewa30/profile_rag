@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import List, Any
-from PyPDF2 import PdfReader
-from docx import Document
+from PyPDF2 import PdfReader  # pyright: ignore[reportMissingImports]
+from docx import Document  # pyright: ignore[reportMissingImports]
 
 class DataLoader:
     def __init__(self, data_dir: str):
@@ -14,6 +14,7 @@ class DataLoader:
         """
         # Use project root data folder
         data_path = Path(self.data_dir).resolve()
+        print(data_path)
         print(f"[DEBUG] Data path: {data_path}")
         documents = []
 
@@ -73,6 +74,15 @@ class DataLoader:
 
 if __name__ == "__main__":
     # Load all documents from "me" directory
-    data_loader = DataLoader("me")
+    import os
+
+    # 1. Get the absolute path of the folder containing this current python script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # 2. Go up one level to the root directory, then down into the "me" directory
+    target_path = os.path.abspath(os.path.join(script_dir, "..", "me"))
+
+    # 3. Pass the resolved absolute path to your loader
+    data_loader = DataLoader(target_path)
     document_text = data_loader.load_all_documents()
     print(document_text)

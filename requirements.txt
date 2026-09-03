@@ -1,5 +1,3 @@
-nltk
-sentence-transformers
 requests
 python-dotenv
 pypdf
@@ -10,4 +8,6 @@ PyPDF2
 python-docx
 numpy
 chromadb
-streamlit
+
+fastapi
+uvicorn
